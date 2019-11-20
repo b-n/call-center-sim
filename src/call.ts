@@ -16,13 +16,16 @@ class Call {
   private startedAtTick: number
   
   constructor({
+    averageTimeToAbandon,
+    oneSigmaWidth,
     expectedAHT,
-    maxWaitTime,
     startedAtTick,
   }: CallOptions) {
     this.expectedAHT = expectedAHT
-    this.maxWaitTime = maxWaitTime + (randn_bm() * 120)
     this.startedAtTick = startedAtTick
+
+    const maxWaitTime = averageTimeToAbandon + (randn_bm() * oneSigmaWidth/2)
+    this.maxWaitTime = maxWaitTime < 3 ? 3 : maxWaitTime
   }
 
   tick() {

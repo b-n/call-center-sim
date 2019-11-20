@@ -1,17 +1,31 @@
 import { table } from 'table'
 import Runner from './runner'
 
-const totalRunners = 2000;
+import configJSON from '../config/config.json'
 
 (() => {
+  const config = configJSON as SimulationOptions
+
+  const {
+    abandonSettings,
+    simulations,
+    simulationCount,
+    slaIntervals
+  } = config
+
   const runners: Array<Runner> = [] as Array<Runner>; 
-  for (let i = 0; i < totalRunners; i++) {
-    runners.push(new Runner({
-      expectedCalls: 10 + (Math.floor(i / 500)) * 10,
-      averageHandleTime: 600,
-      numberOfAgents: 5,
-    }))
-  }
+  
+  simulations.map(({name, callsPerHour, agentCount, averageWorkTime }) => {
+    for (let i = 0; i < simulationCount; i++) {
+      runners.push(new Runner({
+        name: name,
+        expectedCalls: callsPerHour,
+        numberOfAgents: agentCount,
+        averageHandleTime: averageWorkTime,
+        abandonSettings
+      }))
+    }
+  })
 
   let isRunning = true;
   while (isRunning) {
@@ -20,29 +34,24 @@ const totalRunners = 2000;
     }
   }
 
-  const slaBrackets = [
-    { seconds: 20 },
-    { seconds: 40 },
-    { seconds: 60 },
-    { seconds: 120 },
-  ];
+  const slaBrackets = slaIntervals.map(sla => ({seconds: sla}));
 
-  const totalStats: Map<number, Array<RunnerStats>> = new Map();
+  const totalStats: Map<string, Array<RunnerStats>> = new Map();
   for (const r of runners) {
     const stats = r.getStats(slaBrackets);
-    const { totalCalls } = stats;
-    if (!totalStats.has(totalCalls)) {
-      totalStats.set(totalCalls, [] as Array<RunnerStats>)
+    const { name } = stats;
+    if (!totalStats.has(name)) {
+      totalStats.set(name, [] as Array<RunnerStats>)
     }
-    totalStats.get(totalCalls).push(stats)
+    totalStats.get(name).push(stats)
   }
 
   const output = [ [
-    'calls/hr',
+    'simulation',
     'total',
     'successful',
     'abandon',
-    'avg AWT',
+    'avg WT',
   ] ]
 
   slaBrackets.map(({seconds}) => output[0].push(`${seconds}s`))

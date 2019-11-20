@@ -1,0 +1,41 @@
+{
+  "name": "Magic",
+  "simulations": [
+    {
+      "name": "10/5/300",
+      "callsPerHour": 10,
+      "agentCount": 5,
+      "averageWorkTime": 300
+    },
+    {
+      "name": "50/5/300",
+      "callsPerHour": 50,
+      "agentCount": 5,
+      "averageWorkTime": 300
+    },
+    {
+      "name": "50/7/300",
+      "callsPerHour": 50,
+      "agentCount": 7,
+      "averageWorkTime": 300
+    },
+    {
+      "name": "50/10/300",
+      "callsPerHour": 50,
+      "agentCount": 10,
+      "averageWorkTime": 300
+    },
+    {
+      "name": "200/10/600",
+      "callsPerHour": 200,
+      "agentCount": 10,
+      "averageWorkTime": 600
+    }
+  ],
+  "simulationCount": 500,
+  "abandonSettings": {
+    "averageTimeToAbandon": 300,
+    "oneSigmaWidth": 240
+  },
+  "slaIntervals": [ 20, 40, 60, 120, 300 ]
+}

@@ -3,6 +3,9 @@ import Agent from './agent'
 
 class Runner {
 
+  public name: string
+
+  private abandonSettings: AbandonSettings
   private expectedCalls: number
   private averageHandleTime: number
   private maxTicks: number = 3600
@@ -12,10 +15,14 @@ class Runner {
   private totalTicks: number = 0
   
   constructor({
+    name,
     expectedCalls,
     averageHandleTime,
     numberOfAgents,
+    abandonSettings,
   }: RunnerOptions) {
+    this.name = name
+    this.abandonSettings = abandonSettings
     this.expectedCalls = expectedCalls
     this.averageHandleTime = averageHandleTime
     for (let i = 0; i < numberOfAgents; i++) {
@@ -44,9 +51,9 @@ class Runner {
     const nextCallProbability = remainingCalls / remainingTicks
     if (Math.random() < nextCallProbability) {
       this.calls.push(new Call({
+        ...this.abandonSettings,
         startedAtTick: this.totalTicks,
         expectedAHT: this.averageHandleTime,
-        maxWaitTime: 300,
       }))
     }
 
@@ -92,6 +99,7 @@ class Runner {
     callResults.averageWaitTime = callResults.totalWaitTime / callResults.successful
 
     return {
+      name: this.name,
       totalCalls: this.calls.length,
       calls: callResults,
       brackets: bracketResults.map(bracket => ({
